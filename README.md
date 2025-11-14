@@ -67,9 +67,18 @@ Below are the three core DNS investigation queries required for this lab.
 
 ## ✅ Task 1 – Most Frequently Queried Domains
 
-### SPL Query:
-```spl
+### SQL Query:
+```sql
 index=dns_lab sourcetype="json"
 | stats count by query
 | sort -count
+
+## ✅ Task 2 – Most Frequently Queried Domains
+
+###SQL Query:
+```sql
+index=dns_lab sourcetype="json"
+| stats count by "id.orig_h"
+| sort -count
+
 
