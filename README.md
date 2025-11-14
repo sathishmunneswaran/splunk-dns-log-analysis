@@ -1,31 +1,35 @@
 # 🧪 Splunk Basics – DNS Log Analysis Lab
 
-This project demonstrates how to ingest and analyze DNS logs using Splunk.  
-You will explore DNS query patterns, top talkers, and query types using SPL.
+This project walks through ingesting and analyzing DNS logs in Splunk using Zeek JSON logs.  
+It includes all three core investigation tasks:  
+✔️ Task 1 – Top Queried Domains  
+✔️ Task 2 – Top Source Hosts  
+✔️ Task 3 – DNS Query Type Breakdown  
 
 ---
 
 ## 🎯 Objective
 
-- Ingest Zeek DNS logs into Splunk  
-- Perform DNS-based threat hunting  
-- Identify top queried domains  
-- Detect noisy DNS clients  
-- Analyze DNS query types (A, AAAA, PTR, CNAME, etc.)  
-- Build SOC-style investigation skills  
+- Ingest DNS logs into Splunk  
+- Identify suspicious DNS activity  
+- Perform top domain analysis  
+- Detect noisy internal hosts  
+- Analyze DNS query types (A, AAAA, PTR, TXT…)  
+- Build SOC investigation skills  
 
 ---
 
-## 📂 Project Structure
+## 📁 Project Structure
 
 splunk-dns-log-analysis/
 │
 ├── README.md
 │
 ├── screenshots/
-│ ├── task1.png
-│ ├── task2.png
-│ ├── task3.png
+│ ├── task1.png → Top Domains
+│ ├── task2.png → Top Source Hosts
+│ ├── task3.png → DNS Query Types
+│ ├── combined.png (optional)
 │
 └── dns-sample/
 └── dns.log
@@ -33,52 +37,65 @@ splunk-dns-log-analysis/
 
 ---
 
-## 🖥️ Lab Setup
+## 🖥️ Splunk Setup
 
 ### Requirements
-- Splunk Enterprise / Free edition  
-- Zeek DNS log file (`dns.log` in JSON format)  
-- Internet browser to access Splunk Web  
-- Custom Index: `dns_lab` (recommended)
+- Splunk Enterprise / Free  
+- Zeek DNS logs (JSON format)  
+- Index: `dns_lab`
 
 ---
 
-## ⚙️ Uploading DNS Logs into Splunk
+## ⚙️ Uploading DNS Logs to Splunk
 
 1. Open **Splunk Web**
-2. Navigate to **Settings → Add Data**
-3. Choose **Upload from file**
-4. Select your `dns.log`
-5. Set:
-   - **Source Type:** `json`
-   - **Index:** `dns_lab`
+2. Go to **Settings → Add Data**
+3. Choose **Upload**
+4. Select `dns.log`
+5. Configure:
+   - Source type: `json`
+   - Index: `dns_lab`
 6. Click **Submit**
-7. Validate ingestion:
-
+7. Verify:
 
 
 ---
 
-# 🔍 DNS Analysis (SPL Queries)
+# 🔍 **TASK 1 – Most Frequently Queried Domains**
 
-Below are the three core DNS investigation queries required for this lab.
-
----
-
-## ✅ Task 1 – Most Frequently Queried Domains
-
-### SQL Query:
-```sql
+### ✔️ SPL Query
+```spl
 index=dns_lab sourcetype="json"
 | stats count by query
 | sort -count
 
-## ✅ Task 2 – Most Frequently Queried Domains
-
-###SQL Query:
-```sql
 index=dns_lab sourcetype="json"
 | stats count by "id.orig_h"
 | sort -count
 
+✔️ Purpose
+
+Shows which internal IPs generate the most DNS traffic
+
+Noisy hosts may indicate:
+
+Malware beaconing
+
+DNS tunneling
+
+Misconfiguration
+
+
+index=dns_lab sourcetype="json"
+| stats count by qtype
+| sort -count
+
+
+✔️ Purpose
+
+Shows DNS record distribution
+
+Normal: A, AAAA, PTR
+
+Suspicious: TXT, NULL (often used in exfiltration/tunneling)
 
